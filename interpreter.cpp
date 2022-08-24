@@ -119,14 +119,12 @@ int evaluate(const string &r) {
 }
 
 int main() {
+  char x[50];
   while(1) {
     cout << "> ";
     string input;
-    {
-      char x[500];
-      cin.getline(x, 500);
-      input.assign(x);
-    }
+    cin.getline(x, 500);
+    input.assign(x);
     trim_whitespace(input);
     try { cout << evaluate(input); }
     catch(string err) { cout << err; }
