@@ -1,7 +1,6 @@
 package math_interpreter;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
@@ -450,7 +449,7 @@ public class MathLexer2 {
 			++i;
 		}
 
-		return Collections.unmodifiableList(tokens);
+		return tokens;
 	}
 
 	public static void main(String[] args) {

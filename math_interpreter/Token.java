@@ -5,7 +5,7 @@ import java.util.HashMap;
 interface Token {}
 
 enum StructuralToken implements Token {
-	NEWLINE, LEFT_PAREN, RIGHT_PAREN;
+	NEWLINE, LEFT_PAREN, RIGHT_PAREN, COMMA;
 }
 
 interface Operator extends Token {

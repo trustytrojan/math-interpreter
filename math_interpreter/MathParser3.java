@@ -7,10 +7,48 @@ import java.util.List;
 import java.util.Stack;
 
 public class MathParser3 {
-	private final HashMap<String, Object> variables = new HashMap<>();
+	private static int indexOfNonNestedRightParen(List<Token> tokens, int leftParenIndex) {
+		final var size = tokens.size();
+		var depth = 0;
+		for (var i = leftParenIndex; i < size; ++i) {
+			final var token = tokens.get(i);
+			if (token == StructuralToken.LEFT_PAREN)
+				++depth;
+			if (token == StructuralToken.RIGHT_PAREN) {
+				if (--depth == 0) {
+					return i;
+				}
+			}
+		}
+		return size;
+	}
 
-	Object evaluateExpression(List<Token> tokens) {
-		return evaluatePostfix(convertToPostfix(tokens));
+	private static int indexOfNonNestedComma(List<Token> tokens, int startIndex) {
+		final var size = tokens.size();
+		var depth = 0;
+		for (var i = startIndex; i < size; ++i) {
+			final var token = tokens.get(i);
+			if (token == StructuralToken.LEFT_PAREN)
+				++depth;
+			if (token == StructuralToken.RIGHT_PAREN)
+				--depth;
+			if (token == StructuralToken.COMMA && depth == 0)
+				return i;
+		}
+		return size;
+	}
+
+	private static void parseFunctionCalls(List<Token> tokens) {
+		var size = tokens.size();
+		for (var i = 0; i < size - 2; ++i) {
+			final var identifier = tokens.get(i);
+			final var leftParenIndex = i + 1;
+			final var leftParen = tokens.get(leftParenIndex);
+			if (identifier instanceof Identifier && leftParen == StructuralToken.LEFT_PAREN) {
+				final var rightParenIndex = indexOfNonNestedRightParen(tokens, leftParenIndex);
+				
+			}
+		}
 	}
 
 	// Shunting Yard algorithm
@@ -52,6 +90,12 @@ public class MathParser3 {
 		}
 
 		return Collections.unmodifiableList(postfix);
+	}
+
+	private final HashMap<String, Object> variables = new HashMap<>();
+
+	Object evaluateExpression(List<Token> tokens) {
+		return evaluatePostfix(convertToPostfix(tokens));
 	}
 
 	private Object evaluatePostfix(List<Token> postfixTokens) {
