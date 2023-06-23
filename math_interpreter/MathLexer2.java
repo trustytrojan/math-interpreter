@@ -224,7 +224,7 @@ public class MathLexer2 {
 	
 						try {
 							prevToken = tokens.get(tokens.size() - 1);
-						} catch (ArrayIndexOutOfBoundsException e) {
+						} catch (IndexOutOfBoundsException e) {
 							tokens.add(UnaryArithmeticOperator.NEGATE);
 							++i;
 							continue;

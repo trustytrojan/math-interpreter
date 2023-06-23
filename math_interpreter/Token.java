@@ -136,6 +136,7 @@ enum ComparisonOperator implements BinaryOperator {
 				case GREATER_THAN_OR_EQUAL -> LongDoubleOperators.greaterThanOrEqual(aN, bN);
 			};
 		}
+
 		if (a instanceof final Boolean aB && b instanceof final Boolean bB) {
 			return switch (this) {
 				case EQUALS -> aB.equals(bB);
@@ -143,6 +144,7 @@ enum ComparisonOperator implements BinaryOperator {
 				default -> false; 
 			};
 		}
+		
 		return Boolean.FALSE;
 	}
 }
@@ -195,6 +197,7 @@ enum AssignmentOperator implements Operator {
 
 		final var oldValue = variables.get(identifier);
 		final Object newValue;
+
 		if (oldValue instanceof final Number a && value instanceof final Number b) {
 			newValue = switch (this) {
 				case PLUS -> LongDoubleOperators.add(a, b);
