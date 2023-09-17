@@ -1,6 +1,8 @@
 package math_interpreter;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 interface Token {}
 
@@ -228,9 +230,8 @@ final class Identifier implements Operand {
 
 	static Identifier of(String s) {
 		final var cachedIdentifier = IDENTIFIER_CACHE.get(s);
-		if (cachedIdentifier != null) {
+		if (cachedIdentifier != null)
 			return cachedIdentifier;
-		}
 		return new Identifier(s);
 	}
 
@@ -260,9 +261,8 @@ final class Value implements Operand {
 
 	static Value of(Object o) {
 		final var cachedValue = VALUE_CACHE.get(o);
-		if (cachedValue != null) {
+		if (cachedValue != null)
 			return cachedValue;
-		}
 		return new Value(o);
 	}
 
@@ -284,3 +284,5 @@ final class Value implements Operand {
 		return value;
 	}
 }
+
+

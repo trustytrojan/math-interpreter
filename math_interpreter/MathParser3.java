@@ -6,7 +6,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Stack;
 
-public class MathParser3 {
+public class MathParser {
 	/**
 	 * Finds the next non-nested {@code StructuralToken.RIGHT_PAREN} in
 	 * {@code tokens} starting at {@code leftParenIndex}. Mainly used when parsing
@@ -18,7 +18,7 @@ public class MathParser3 {
 	 *                       {@code StructuralToken.LEFT_PAREN}
 	 * @return The index of the next non-nested {@code StructuralToken.RIGHT_PAREN}
 	 */
-	private static int indexOfNonNestedRightParen(List<Token> tokens, int leftParenIndex) {
+	static int indexOfNonNestedRightParen(List<Token> tokens, int leftParenIndex) {
 		final var size = tokens.size();
 		var depth = 0;
 		for (var i = leftParenIndex; i < size; ++i) {
@@ -41,7 +41,7 @@ public class MathParser3 {
 	 *                   immediately after a {@code StructuralToken.COMMA}
 	 * @return The index of the next non-nested {@code StructuralToken.COMMA}
 	 */
-	private static int indexOfNonNestedComma(List<Token> tokens, int startIndex) {
+	static int indexOfNonNestedComma(List<Token> tokens, int startIndex) {
 		final var size = tokens.size();
 		var depth = 0;
 		for (var i = startIndex; i < size; ++i) {
@@ -56,19 +56,46 @@ public class MathParser3 {
 		return size;
 	}
 
-	private static void checkSyntax(List<Token> tokens) {
-		// TODO: implement syntax checker
-	}
+    private final class FunctionCall implements Operand {
+        private final String functionName;
+        private final List<Object> arguments;
+
+        FunctionCall(List<Token> tokens) {
+            final var fnIdentifier = tokens.get(0);
+            final var leftParen = tokens.get(1);
+            final var rightParenIndex = MathParser.indexOfNonNestedRightParen(tokens, 0);
+            final var rightParen = tokens.get(rightParenIndex);
+            arguments = new ArrayList<>();
+            final var argTokens = tokens.subList(1, rightParenIndex);
+            final var size = argTokens.size();
+            for (var i = 0; i < size; ++i) {
+                final var commaIndex = MathParser.indexOfNonNestedComma(tokens, 0);
+                arguments.add(evaluateExpression(argTokens.subList(i, commaIndex)));
+                i = commaIndex;
+            }
+        }
+
+        @Override
+        public Object getValue(HashMap<String, Object> variables) {
+            final var fn = (Function) variables.get(functionName);
+            if (fn == null)
+                throw new RuntimeException("Function " + functionName + " does not exist");
+
+        }
+    }
 
 	private static void parseFunctionCalls(List<Token> tokens) {
 		final var size = tokens.size();
 		for (var i = 0; i < size - 2; ++i) {
-			final var identifier = tokens.get(i);
+			final var fnIdentifier = tokens.get(i);
 			final var leftParenIndex = i + 1;
 			final var leftParen = tokens.get(leftParenIndex);
-			if (identifier instanceof Identifier && leftParen == StructuralToken.LEFT_PAREN) {
+			if (fnIdentifier instanceof Identifier && leftParen == StructuralToken.LEFT_PAREN) {
 				final var rightParenIndex = indexOfNonNestedRightParen(tokens, leftParenIndex);
-				
+                final var fnCallTokens = tokens.subList(i, rightParenIndex + 1);
+				tokens.removeAll(fnCallTokens);
+                tokens.add(new FunctionCall(fnCallTokens));
+                i = rightParenIndex;
 			}
 		}
 	}
@@ -131,6 +158,7 @@ public class MathParser3 {
 	private final HashMap<String, Object> variables = new HashMap<>();
 
 	Object evaluateExpression(List<Token> tokens) {
+        parseFunctionCalls(tokens);
 		return evaluatePostfix(convertToPostfix(tokens));
 	}
 
@@ -168,7 +196,7 @@ public class MathParser3 {
 	}
 
 	public static void main(String[] args) {
-		final var mathParser = new MathParser3();
+		final var mathParser = new MathParser();
 		final var console = System.console();
 		String line;
 		System.out.print("> ");
